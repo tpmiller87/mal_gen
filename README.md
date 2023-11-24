@@ -1,5 +1,5 @@
 # mal_gen
-A Bash script that automates the creation of a Cobalt Strike Malleable Profile. TLS certificates from nginx should be in a zip file called `certificats.zip`. The zip file should be in the same directory as mal_gen.
+A Bash script that automates the creation of a Cobalt Strike Malleable Profile. TLS certificates from nginx should be in a zip file called `certificates.zip`. The zip file should be in the same directory as mal_gen.
 
 Usage:
 ```
