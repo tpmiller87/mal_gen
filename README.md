@@ -2,7 +2,8 @@
 A Bash script that automates the creation of a Cobalt Strike Malleable Profile.
 
 Usage:
-git clone
+git clone https://github.com/tpmiller87/mal_gen.git
+cd mal_gen
 chmod +x mal_gen.sh
 ./mal_gen.sh
 
