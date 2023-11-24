@@ -2,10 +2,12 @@
 A Bash script that automates the creation of a Cobalt Strike Malleable Profile.
 
 Usage:
+```
 git clone https://github.com/tpmiller87/mal_gen.git
 cd mal_gen
 chmod +x mal_gen.sh
 ./mal_gen.sh
+```
 
 You will be prompted for the following options:
 
@@ -17,6 +19,13 @@ You will be prompted for the following options:
 4. Sleep is the beacon check-in time in milliseconds. One minute = 60000 milliseconds. Ten minutes = 600000 milliseconds. Numbers only.
 5. Jitter is the beacon jitter value. If you set a 50% jitter on a one minute sleep, your beacon can check in up to 30 seconds early.
 
+As of this commit, there is hardly ANY error checking. It is meant to be used with TLS certs, so if you don't use one expect errors!
+
 BIG credit goes to the [SourcePoint](https://github.com/Tylous/SourcePoint) tool made by [Tylous](https://github.com/Tylous).
 This tool is 90% a bash port of SourcePoint with a few additional customizations of my own.
 
+##**!!!Warning!!!**
+
+People who are actually good at coding/scripting will probably be revolted by this script. The script itself is a formatting mess and the output malleable profile is also spaghetti in spots.
+
+It's definitely a WIP and it works, so I'm good with it!
