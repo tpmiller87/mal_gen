@@ -215,7 +215,7 @@ min_alloc_val=$(echo $((4096 + $RANDOM % 57841)))
 createthread_val=$(echo $((500 + $RANDOM % 2500)))
 
 post_ex_exe=(
-	"WerFault.exe"
+	"wmiprvse.exe"
 	"auditpol.exe"
 	"bootcfg.exe"
 	"expand.exe"
@@ -701,6 +701,7 @@ echo 'stage {
 	set sleep_mask "true";' $'\n' >> $prof_name.profile
 echo "	set magic_mz_x86 \"$selected_MZ86$selected_MZ862\";" >> $prof_name.profile
 echo "	set magic_mz_x64 \"$selected_MZ64$selected_MZ642\";" $'\n' >> $prof_name.profile
+echo " 	set magic_pe set magic_pe \"$seleced_MZ64\";
 
 echo "$selected_pe_clone" $'\n' >> $prof_name.profile
 
