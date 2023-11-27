@@ -351,10 +351,7 @@ Slack_func () {
 	maxage2=$(echo $((172800 + $RANDOM % 31536001)))
 	maxage3=$(echo $((172800 + $RANDOM % 31536001)))
 
-	echo "http-config {
-	set trust_x_forwarded_for \"false\";
-	}
-
+	echo "
 		http-get {
 
 		set uri \"/messages/$enduri9 /messages/$enduri3 /messages/$enduri8 /messages/$enduri4 /messages/$enduri6 \";
@@ -536,10 +533,7 @@ Owa_func () {
 	num86=$(echo $((19340 + $RANDOM % 15370000)))
 	num64=$(echo $((19340 + $RANDOM % 15370000)))
 
-	echo "http-config {
-	set trust_x_forwarded_for \"false\";
-	}
-
+	echo "
 	http-get {
 
 		set uri \"/owa/$enduriowa1 /owa/$enduriowa2 /owa/$enduriowa3 /owa/$enduriowa4 /owa/$enduriowa5 \";
