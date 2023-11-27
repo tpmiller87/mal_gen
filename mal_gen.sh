@@ -1,13 +1,15 @@
 #!/bin/bash
 
 read -p "What will the name of your profile be?: " prof_name
-read -p "What's the doman you're using? e.g. tld.domain: " domain_name
+read -p "What's the domain you're using? e.g. tld.domain: " domain_name
 read -p "What profile do you want? 1) Windows update 2) Slack 3) OWA (number only): " profile_selection
 read -p "What is your sleep value (milliseconds, 60000=1 minute)?: " sleep
 read -p "What is the jitter value (only numbers pls)?: " jitter
 
+
 #generate the prepend byte values for x64 and x86 payloads to obfuscate the magic bytes.
 prepend_bytes=("40" "41" "42" "6690" "40" "43" "44" "45" "46" "47" "48" "49" "4c" "90" "0f1f00" "660f1f0400" "0f1f0400" "0f1f00" "0f1f00" "87db" "87c9" "87d2" "6687db" "6687c9" "6687d2")
+
 split_into_chunks() {
     local value=$1
     while [ -n "$value" ]; do
@@ -15,6 +17,7 @@ split_into_chunks() {
         value=${value:2}
     done
 }
+
 processed_bytes=()
 for val in "${prepend_bytes[@]}"; do
     if [ ${#val} -gt 2 ]; then
@@ -25,8 +28,12 @@ for val in "${prepend_bytes[@]}"; do
         processed_bytes+=("\\x$val")
     fi
 done
+
 shuffled_bytes_x64=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
+shuffled_bytes_x642=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
 shuffled_bytes_x86=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
+shuffled_bytes_x862=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
+
 #-------------------------------------------------------------------------------------
 
 user_agents=(
@@ -215,7 +222,7 @@ min_alloc_val=$(echo $((4096 + $RANDOM % 57841)))
 createthread_val=$(echo $((500 + $RANDOM % 2500)))
 
 post_ex_exe=(
-	"wmiprvse.exe"
+	"wmiprvse.exe -Embedding"
 	"auditpol.exe"
 	"bootcfg.exe"
 	"expand.exe"
@@ -700,15 +707,15 @@ echo 'stage {
 	set smartinject "true";
 	set sleep_mask "true";' $'\n' >> $prof_name.profile
 echo "	set magic_mz_x86 \"$selected_MZ86$selected_MZ862\";" >> $prof_name.profile
-echo "	set magic_mz_x64 \"$selected_MZ64$selected_MZ642\";" $'\n' >> $prof_name.profile
-echo " 	set magic_pe set magic_pe \"$seleced_MZ64\";
+echo "	set magic_mz_x64 \"$selected_MZ64$selected_MZ642\";" >> $prof_name.profile
+echo "	set magic_pe \"$selected_MZ64\";" $'\n' >> $prof_name.profile
 
 echo "$selected_pe_clone" $'\n' >> $prof_name.profile
 
 echo " 
 	transform-x86 {
 		
-	    prepend \"$shuffled_bytes_x86\"; 
+	    prepend \"$shuffled_bytes_x86$shuffled_bytes_x862\"; 
 	    strrep \"This program cannot be run in DOS mode\" \"\";
 	    strrep \"ReflectiveLoader\" \"\";
 	    strrep \"beacon.x64.dll\" \"\";
@@ -742,7 +749,7 @@ echo "
 
 echo " 
 	transform-x64 {
-	    prepend \"$shuffled_bytes_x64\"; 
+	    prepend \"$shuffled_bytes_x64$shuffled_bytes_x642\"; 
 	    strrep \"This program cannot be run in DOS mode\" \"\";
 	    strrep \"ReflectiveLoader\" \"\";
 	    strrep \"beacon.x64.dll\" \"\";
