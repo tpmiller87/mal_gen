@@ -11,7 +11,7 @@ chmod +x mal_gen.sh
 
 You will be prompted for the following options:
 
-![image](https://github.com/tpmiller87/mal_gen/assets/15959707/69d1422d-f239-427f-b995-d6b8fda0f2d2)
+![image](https://github.com/tpmiller87/mal_gen/assets/15959707/4b4c4dc8-07a2-493e-add6-3fff83f2c447)
 
 1. The profile name should just be the name, the script will append '.profile'.
 2. The domain is the domain you are using...if using TLS, it should be the same as the certs.
