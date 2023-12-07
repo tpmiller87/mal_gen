@@ -230,6 +230,10 @@ post_ex_exe=(
 	"fsutil.exe"
 	"gpupdate.exe"
 	"dllhost.exe"
+ 	"logman.exe"
+  	"powercfg.exe"
+   	"mtstocom.exe"
+    	"dtdump.exe"
 	)
 selected_post_ex_exe_86=${post_ex_exe[ $RANDOM % ${#post_ex_exe[@]} ]}
 selected_post_ex_exe_64=${post_ex_exe[ $RANDOM % ${#post_ex_exe[@]} ]}
