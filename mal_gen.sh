@@ -5,6 +5,7 @@ read -p "What's the domain you're using? e.g. tld.domain: " domain_name
 read -p "What profile do you want? 1) Windows update 2) Slack 3) OWA (number only): " profile_selection
 read -p "What is your sleep value (milliseconds, 60000=1 minute)?: " sleep
 read -p "What is the jitter value (only numbers pls)?: " jitter
+read -p "Do you have certs? y/n: " tls
 
 
 #generate the prepend byte values for x64 and x86 payloads to obfuscate the magic bytes.
@@ -837,8 +838,18 @@ else
     echo "Invalid choice"
 fi
 
-storemaker >> $prof_name.profile
-
-#Outlook profile missing, maybe add more profiles?
-#Add comments
-#Clean the code lol
+lowtls=$(echo "$tls" | tr '[:upper:]' '[:lower:]')
+if [ "$lowtls" == "y" ]; then
+	storemaker >> $prof_name.profile
+elif [ "$lowtls" == "n" ]; then
+	echo "Using self-signed Outlook certs, NOT OPSEC SAFE!!!"
+    echo 'https-certificate {
+    set CN       "mail.live.com"; #Common Name
+    set O        "Microsoft Corporation"; #Organization Name
+    set C        "US"; #Country
+    set L        "Redmond"; #Locality
+    set OU       "Outlook"; #Organizational Unit Name
+    set ST       "Washington"; #State or Province
+    set validity "365"; #Number of days the cert is valid for
+	}' >> $prof_name.profile
+fi
