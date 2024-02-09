@@ -19,6 +19,7 @@ You will be prompted for the following options:
 4. Sleep is the beacon check-in time in milliseconds. One minute = 60000 milliseconds. Ten minutes = 600000 milliseconds. Numbers only. Must be >=1.
 5. Jitter is the beacon jitter value. If you set a 50% jitter on a one minute sleep, your beacon can check in up to 30 seconds early.
 6. Option for TSL certs. If yes, it will generate a keystore file and random password for your certs (must be in a zip called certificates.zip in the same directory).
+
    a. If no, it will fill in the HTTPS section with self-signed certs based on Outlook. THIS SHOULD BE FOR RANGES OR TESTING ONLY, NOT OPSEC SAFE!!!
 
 Remember to run C2Lint against the finished file!
