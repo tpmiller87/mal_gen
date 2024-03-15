@@ -26,3 +26,5 @@ Remember to run C2Lint against the finished file!
 
 BIG credit goes to the [SourcePoint](https://github.com/Tylous/SourcePoint) tool made by [Tylous](https://github.com/Tylous).
 This tool is 90% a bash port of SourcePoint with a few additional customizations of my own.
+
+Some of the modifications were also made by using the tools from this article from [White Knight Labs](https://whiteknightlabs.com/2023/05/23/unleashing-the-unseen-harnessing-the-power-of-cobalt-strike-profiles-for-edr-evasion/).
